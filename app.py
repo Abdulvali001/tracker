@@ -148,18 +148,3 @@ def client_dashboard():
     payments = Payment.query.filter_by(sale_id=sale.id).all() if sale else []
     return render_template('client.html', user=user, sale=sale, payments=payments)
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        # Optional: create admin user if missing
-        from werkzeug.security import generate_password_hash
-        if not User.query.filter_by(email='abdulvali6091@gmail.com').first():
-            admin = User(
-                name='Abdulvali',
-                email='abdulvali6091@gmail.com',
-                password=generate_password_hash('admin123'),
-                role='admin'
-            )
-            db.session.add(admin)
-            db.session.commit()
-    app.run(debug=True)
