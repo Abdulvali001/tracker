@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 app.secret_key = 'your-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///installments.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
