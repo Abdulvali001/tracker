@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
 # Path to SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///installments.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
