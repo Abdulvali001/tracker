@@ -151,12 +151,14 @@ def client_dashboard():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        from werkzeug.security import generate_password_hash
+        from models import User  # Or use User directly if defined in the same file
         if not User.query.filter_by(email='abdulvali6091@gmail.com').first():
             admin = User(
                 name='Abdulvali',
                 email='abdulvali6091@gmail.com',
                 password=generate_password_hash('admin123'),
-                role=ROLE_ADMIN
+                role='admin'
             )
             db.session.add(admin)
             db.session.commit()
