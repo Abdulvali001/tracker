@@ -14,12 +14,11 @@ db = SQLAlchemy(app)
 
 # User model
 class User(db.Model):
-    __tablename__ = 'user'  # Ensure foreign key can reference this
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200))
-    role = db.Column(db.String(10))  # 'admin' or 'client'
+    role = db.Column(db.String(10))  
 
 # Payment model
 class Payment(db.Model):
