@@ -14,11 +14,13 @@ db = SQLAlchemy(app)
 
 # User model
 class User(db.Model):
+    __tablename__ = 'user'  # ✅ This line is 100% required!
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200))
-    role = db.Column(db.String(10))  
+    role = db.Column(db.String(10))  # 'admin' or 'client' 
 
 # Payment model
 class Payment(db.Model):
