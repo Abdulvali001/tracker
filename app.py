@@ -63,10 +63,6 @@ def client_dashboard():
 def logout():
     session.clear()
     return redirect(url_for('login'))
-@app.route('/add_client', methods=['GET', 'POST'])
-def add_client():
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('login'))
 
     if request.method == 'POST':
         name = request.form['name']
@@ -103,3 +99,9 @@ def add_payment():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+@app.route('/client_dashboard')
+def client_dashboard():
+    if 'user_id' in session and session.get('role') == 'client':
+        return render_template('client_dashboard.html')
+    return redirect(url_for('login'))
