@@ -65,6 +65,43 @@ def client_dashboard():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+@app.route('/add_client', methods=['GET', 'POST'])
+def add_client():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = generate_password_hash(request.form['password'])
+        role = 'client'
+
+        new_client = User(name=name, email=email, password=password, role=role)
+        db.session.add(new_client)
+        db.session.commit()
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('add_client.html')
+
+
+@app.route('/add_payment', methods=['GET', 'POST'])
+def add_payment():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        client_id = request.form['client_id']
+        model = request.form['model']
+        amount = float(request.form['amount'])
+        status = request.form['status']
+
+        new_payment = Payment(client_id=client_id, model=model, amount=amount, status=status)
+        db.session.add(new_payment)
+        db.session.commit()
+        return redirect(url_for('admin_dashboard'))
+
+    clients = User.query.filter_by(role='client').all()
+    return render_template('add_payment.html', clients=clients)
 
 if __name__ == '__main__':
     app.run(debug=True)
