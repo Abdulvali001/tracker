@@ -1,0 +1,13 @@
+<h2>Add Payment</h2>
+<form method="post">
+  Client:
+  <select name="client_id">
+    {% for client in clients %}
+      <option value="{{ client.id }}">{{ client.name }}</option>
+    {% endfor %}
+  </select><br>
+  Model: <input type="text" name="model"><br>
+  Amount: <input type="number" name="amount" step="0.01"><br>
+  Status: <input type="text" name="status"><br>
+  <button type="submit">Add Payment</button>
+</form>
