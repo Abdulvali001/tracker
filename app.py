@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
-# Path to SQLite database
+# Configure the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -14,6 +14,7 @@ db = SQLAlchemy(app)
 
 # User model
 class User(db.Model):
+    __tablename__ = 'user'  # Ensure foreign key can reference this
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(150), unique=True, nullable=False)
@@ -26,52 +27,72 @@ class Payment(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     model = db.Column(db.String(100))
     amount = db.Column(db.Float)
-    status = db.Column(db.String(20))  # Paid, Pending, etc.
 
+# Home route
 @app.route('/')
-def index():
+def home():
     return redirect(url_for('login'))
 
+# Register route
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = generate_password_hash(request.form['password'])
+        role = request.form['role']
+
+        new_user = User(name=name, email=email, password=password, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['role'] = user.role
-            return redirect('/admin' if user.role == 'admin' else '/client')
-        return 'Invalid credentials', 401
+
+            if user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            elif user.role == 'client':
+                return redirect(url_for('client_dashboard'))
+
+        return 'Invalid credentials'
+
     return render_template('login.html')
 
-@app.route('/admin')
+# Admin dashboard
+@app.route('/admin_dashboard')
 def admin_dashboard():
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    users = User.query.all()
-    payments = Payment.query.all()
-    return render_template('dashboard.html', users=users, payments=payments)
+    if 'user_id' in session and session.get('role') == 'admin':
+        users = User.query.all()
+        return render_template('admin_dashboard.html', users=users)
+    return redirect(url_for('login'))
 
+# Client dashboard
+@app.route('/client_dashboard')
+def client_dashboard():
+    if 'user_id' in session and session.get('role') == 'client':
+        payments = Payment.query.filter_by(client_id=session['user_id']).all()
+        return render_template('client_dashboard.html', payments=payments)
+    return redirect(url_for('login'))
+
+# Logout route
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = generate_password_hash(request.form['password'])
-        role = 'client'
-
-        new_client = User(name=name, email=email, password=password, role=role)
-        db.session.add(new_client)
-        db.session.commit()
-        return redirect(url_for('admin_dashboard'))
-
-    return render_template('add_client.html')
-
-
+# Add payment (admin only)
 @app.route('/add_payment', methods=['GET', 'POST'])
 def add_payment():
     if 'user_id' not in session or session.get('role') != 'admin':
@@ -81,9 +102,8 @@ def add_payment():
         client_id = request.form['client_id']
         model = request.form['model']
         amount = float(request.form['amount'])
-        status = request.form['status']
 
-        new_payment = Payment(client_id=client_id, model=model, amount=amount, status=status)
+        new_payment = Payment(client_id=client_id, model=model, amount=amount)
         db.session.add(new_payment)
         db.session.commit()
         return redirect(url_for('admin_dashboard'))
@@ -91,11 +111,8 @@ def add_payment():
     clients = User.query.filter_by(role='client').all()
     return render_template('add_payment.html', clients=clients)
 
+# Run app
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
-    
-@app.route('/client_dashboard')
-def client_dashboard():
-    if 'user_id' in session and session.get('role') == 'client':
-        return render_template('client_dashboard.html')
-    return redirect(url_for('login'))
