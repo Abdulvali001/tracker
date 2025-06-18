@@ -53,13 +53,11 @@ def admin_dashboard():
     payments = Payment.query.all()
     return render_template('dashboard.html', users=users, payments=payments)
 
-@app.route('/client')
+@app.route('/client_dashboard')
 def client_dashboard():
-    if 'user_id' not in session or session.get('role') != 'client':
-        return redirect(url_for('login'))
-    user_id = session.get('user_id')
-    payments = Payment.query.filter_by(client_id=user_id).all()
-    return render_template('client_dashboard.html', payments=payments)
+    if 'user_id' in session and session.get('role') == 'client':
+        return render_template('client_dashboard.html')
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
