@@ -1,34 +1,94 @@
-<!-- templates/add_client.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Client</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2d3e50;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .container {
+            padding: 30px;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .actions {
+            margin-bottom: 20px;
+        }
+        .actions a {
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        .logout {
+            background-color: #e74c3c;
+        }
+    </style>
 </head>
 <body>
-    <h2>Add New Client</h2>
-    <form method="POST">
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br><br>
+    <header>📊 Admin Dashboard</header>
+    <div class="container">
+        <div class="actions">
+            <a href="/add_client">➕ Add Client</a>
+            <a href="/add_payment">💰 Add Payment</a>
+            <a href="/logout" class="logout">🔓 Logout</a>
+        </div>
 
-        <label>Email:</label><br>
-        <input type="email" name="email"><br><br>
-
-        <label>Phone Model:</label><br>
-        <input type="text" name="model" required><br><br>
-
-        <label>Total Price ($):</label><br>
-        <input type="number" name="total_price" step="0.01" required><br><br>
-
-        <label>Down Payment ($):</label><br>
-        <input type="number" name="down_payment" step="0.01" required><br><br>
-
-        <label>Installment Months:</label><br>
-        <input type="number" name="months" required><br><br>
-
-        <label>Start Date:</label><br>
-        <input type="date" name="start_date" required><br><br>
-
-        <input type="submit" value="Add Client">
-    </form>
+        <div class="section">
+            <h3>📋 Clients</h3>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th></tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
