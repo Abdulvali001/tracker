@@ -111,6 +111,21 @@ def add_payment():
 
     clients = User.query.filter_by(role='client').all()
     return render_template('add_payment.html', clients=clients)
+@app.route('/add_client', methods=['GET', 'POST'])
+def add_client():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = generate_password_hash(request.form['password'])
+        new_user = User(name=name, email=email, password=password, role='client')
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('add_client.html')
 
 # Run app
 if __name__ == '__main__':
